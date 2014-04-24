@@ -43,10 +43,10 @@ make open
 ```
 ### Results ###
 * overlap among three SNP callers
-![alt tag]()
+![alt tag](https://raw.githubusercontent.com/wuzhigang05/benchmark_SNP_callers/master/venn.png)
 
 * TPR and FDR of three SNP callers
-![alt tag]()
+![alt tag](https://raw.githubusercontent.com/wuzhigang05/benchmark_SNP_callers/master/plot.png)
 
 ### Comments ###
 Send your comments to zhigang dot wu at email dot ucr dot edu
