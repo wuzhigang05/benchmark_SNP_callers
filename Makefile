@@ -1,4 +1,4 @@
-all: sam.raw.vcf gatk.raw.vcf varianttools.raw.vcf
+all: plot.pdf venn.pdf
 ref = Chr4.fasta
 refIndex = $(addsuffix .sa, $(ref))
 readFile = sreads.fq
@@ -62,7 +62,11 @@ MarkDuplicates.jar:
 	ln -s /opt/picard/1.81/MarkDuplicates.jar .
 CreateSequenceDictionary.jar:
 	ln -s /opt/picard/1.81/CreateSequenceDictionary.jar .
-
+sam.raw.1.vcf gatk.raw.1.vcf \
+sam.raw.1.vcf gatk.raw.1.vcf: sam.raw.vcf gatk.raw.vcf varianttools.raw.vcf
+	./generateFilteredFiles.py
+plot.pdf venn_0.pdf:sam.raw.1.vcf gatk.raw.1.vcf
+	./overalp.y
 venn.pdf: venn_4.pdf venn_1.pdf venn_2.pdf venn_3.pdf
 	pdfjam --nup '2x2' --outfile $@ venn_1.pdf - venn_2.pdf - \
 	venn_3.pdf - venn_4.pdf - 
