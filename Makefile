@@ -1,4 +1,4 @@
-all: plot.pdf venn.pdf
+all: plot.png venn.png
 ref = Chr4.fasta
 refIndex = $(addsuffix .sa, $(ref))
 readFile = sreads.fq
@@ -70,4 +70,7 @@ plot.pdf venn_0.pdf:sam.raw.1.vcf gatk.raw.1.vcf
 venn.pdf: venn_4.pdf venn_1.pdf venn_2.pdf venn_3.pdf
 	pdfjam --nup '2x2' --outfile $@ venn_1.pdf - venn_2.pdf - \
 	venn_3.pdf - venn_4.pdf - 
-
+plot.png:plot.pdf
+	convert $< $@
+venn.png:venn.pdf
+	convert $< $@
