@@ -63,7 +63,7 @@ MarkDuplicates.jar:
 CreateSequenceDictionary.jar:
 	ln -s /opt/picard/1.81/CreateSequenceDictionary.jar .
 
-venn.pdf: venn_0.pdf venn_1.pdf venn_2.pdf venn_3.pdf
-	pdfjam --nup '2x2' --outfile $@ venn_0.pdf - venn_1.pdf - venn_2.pdf - \
-	venn_3.pdf
+venn.pdf: venn_4.pdf venn_1.pdf venn_2.pdf venn_3.pdf
+	pdfjam --nup '2x2' --outfile $@ venn_1.pdf - venn_2.pdf - \
+	venn_3.pdf - venn_4.pdf - 
 
