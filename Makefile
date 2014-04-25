@@ -2,8 +2,14 @@ all: sam.raw.vcf gatk.raw.vcf varianttools.raw.vcf
 ref = Chr4.fasta
 refIndex = $(addsuffix .sa, $(ref))
 readFile = sreads.fq
+# preads is the file name contains reads simulated from pseudo genome
+preads = preads.fq
+# rreads is the file name contains reads simulated from reference genome
+rreads = rreads.fq
 sortMem = 5G
 mutation = 1000
+altCov = 10
+refCov = 0
 javaArgs = -Xmx4g
 
 sam.raw.vcf: aln.sorted.rmdup.bam $(ref) 
@@ -32,8 +38,14 @@ ${refIndex}: ${ref}
 pChr4.fasta: pseudogenome.py
 	./$< ${ref} 
 
-$(readFile): pChr4.fasta
-	art_illumina -rs 100 -l 55 -f 10 -i pChr4.fasta -o $(basename $(readFile))
+$(preads): pChr4.fasta
+	art_illumina -rs 100 -l 55 -f 10 -i pChr4.fasta -o $(basename $(preads))
+
+$(rreads): pChr4.fasta
+	touch $(rreads)
+
+$(readFile): $(preads) $(rreads)
+	cat $(preads) $(rreads) > $@
 
 validated.aln.sorted.bam: aln.sorted.bam AddOrReplaceReadGroups.jar
 	java $(javaArgs) -jar AddOrReplaceReadGroups.jar I=$< O=$@ LB=1 PL=illumina PU=whatever SM=whatever

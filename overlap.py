@@ -6,6 +6,11 @@ import pdb
 import sys
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2, venn3
+# to solve 'Invalid DISPLAY variable' error
+# http://bit.ly/1nkAwuk
+import matplotlib
+# Force matplotlib to not use any Xwindows backend.
+matplotlib.use('PDF')
 
 def sensitivity(found, total):
     try:
@@ -45,6 +50,7 @@ def getSNPs(file):
 def calculate(files, P):
   snps = map(getSNPs, files)
   sensitivities = Series(map(lambda x: sensitivity(x, P), snps), index = files, name="TPR")
+  pdb.set_trace()
   specificities = Series(map(lambda x: fdr(x, P), snps), index = files, name="FDR")
   result = concat([sensitivities, specificities], axis=1)
   print result
@@ -72,42 +78,38 @@ def venn3Diagram(A, B, C, labels, figName):
     v = venn3(subsets=[A, B, C], set_labels=labels)
     for l in v.set_labels:
         l.set_size(18)
-    # for l in labels:
-    #     v.get_label_by_id(l)
     fig.savefig(figName)
 
+def TPRandFDR(file, theoreticalSnps):
+    snps = getSNPs(file)
+    TP = snps & theoreticalSnps
+    FP = snps - TP
+    print "#TP: ", len(TP)
+    print "TPR: ", float(len(TP))/len(theoreticalSnps)
+    print "#FP: ", len(FP)
+    print "FDR: ", float(len(FP))/len(snps)
+    
 if __name__ == '__main__':
-  #rawSnps = getSNPs("raw.vcf")
-  #rawSnps = set(np.load("mutatedPos.npy"))
-  #theoreticalSnps = getSNPs("vcf_chr_4.vcf")
-  theoreticalSnps = set(np.load("mutatedPos.npy") + 1)
   o = sys.stdout
   e = sys.stderr
-  # total possible SNPs foundable by SNP caller is the intersection of dbSNPs
-  # and the positions  reporting SNP with at least 1X read coverage
-  #allSnps = rawSnps & theoreticalSnps 
+  theoreticalSnps = set(np.load("mutatedPos.npy") + 1)
   allSnps = theoreticalSnps 
-  # in order to calculate the false positive rate, we need to know the 
-  # true negative rate, which is for all positions with read coverage but 
-  # are not overallping with know dbSNPs
-  #trueNegative = set.difference(rawSnps, theoreticalSnps)
   files = ["sam.raw.vcf", "gatk.raw.vcf", "varianttools.raw.vcf"]
-      #"gatk_haplotypeCaller.vcf", "gatk_unifiedCaller_realigned.vcf"]
-      #"gatk_haplotypeCaller.vcf", "snp.vcf"]
   results = []
-  #for q in [0, 50, 100, 150, 200, 220]:
   newFiles = []
   for f in files:
       tmp = [f]
-      for i in range(1, 4):
+      for i in range(1, 10):
         tmp.append(".".join(f.split('.')[:2] + [str(i), 'vcf']))
       newFiles += tmp 
-  for i in range(4):
-      venn3Diagram(getSNPs(newFiles[i]), getSNPs(newFiles[i+4]), getSNPs(newFiles[i+8]), 
-              [newFiles[i], newFiles[i+4], newFiles[i+8]], "venn_%d.pdf" % i)
-  sams = calculate(newFiles[:4], allSnps)
-  gatks = calculate(newFiles[4:8], allSnps)
-  varianttools = calculate(newFiles[8:], allSnps)
+  # for f in newFiles[10:20]:
+  #     TPRandFDR(f, theoreticalSnps)
+  for i in range(10):
+      venn3Diagram(getSNPs(newFiles[i]), getSNPs(newFiles[i+10]), getSNPs(newFiles[i+20]), 
+              [newFiles[i], newFiles[i+10], newFiles[i+20]], "venn_%d.pdf" % i)
+  sams = calculate(newFiles[:10], allSnps)
+  gatks = calculate(newFiles[10:20], allSnps)
+  varianttools = calculate(newFiles[20:], allSnps)
   
   fig, ax = plt.subplots()
   ax.plot(sams['FDR'], sams['TPR'], 'r-^', label='samtools/bcftools')
