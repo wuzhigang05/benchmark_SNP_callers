@@ -1,4 +1,4 @@
-all: plot.png venn.png
+all: plot.pdf venn.pdf
 ref = Chr4.fasta
 refIndex = $(addsuffix .sa, $(ref))
 readFile = sreads.fq
@@ -12,14 +12,19 @@ altCov = 10
 refCov = 0
 javaArgs = -Xmx4g
 
+export PATH :=$(shell pwd):/rhome/zwu/bin/:/opt/samtools/0.1.19/bin:/opt/java/jdk1.7.0_17/bin/:$(PATH)
+
 sam.raw.vcf: aln.sorted.rmdup.bam $(ref) 
 	samtools mpileup -Iuf  $(ref) $< | bcftools view -Nvcg - > $@
 
 gatk.raw.vcf: realigned.bam 
 	java $(javaArgs) -jar GenomeAnalysisTK.jar -T UnifiedGenotyper -R $(ref) -I $< -o $@
 
-varianttools.raw.vcf varianttools.raw.1.vcf varianttools.raw.2.vcf varianttools.raw.3.vcf: run.R \
-    data/Chr4.fasta data/Chr4.dict data/Chr4.fasta.fai aln.sorted.rmdup.bam.bai
+varianttools.raw.vcf\
+varianttools.raw.1.vcf varianttools.raw.2.vcf varianttools.raw.3.vcf \
+varianttools.raw.4.vcf varianttools.raw.5.vcf varianttools.raw.6.vcf \
+varianttools.raw.7.vcf varianttools.raw.8.vcf varianttools.raw.9.vcf: \
+run.R data/Chr4.fasta data/Chr4.dict data/Chr4.fasta.fai aln.sorted.rmdup.bam.bai
 	Rscript run.R
 
 aln.sorted.rmdup.bam: aln.sorted.bam
@@ -39,13 +44,14 @@ pChr4.fasta: pseudogenome.py
 	./$< ${ref} 
 
 $(preads): pChr4.fasta
-	art_illumina -rs 100 -l 55 -f 10 -i pChr4.fasta -o $(basename $(preads))
+	art_illumina -rs 100 -l 55 -f $(altCov) -i $< -o $(basename $(preads))
 
-$(rreads): pChr4.fasta
+$(rreads): Chr4.fasta
 	touch $(rreads)
 
 $(readFile): $(preads) $(rreads)
 	cat $(preads) $(rreads) > $@
+	rm -f $(basename $(rreads))* $(basename $(preads))*
 
 validated.aln.sorted.bam: aln.sorted.bam AddOrReplaceReadGroups.jar
 	java $(javaArgs) -jar AddOrReplaceReadGroups.jar I=$< O=$@ LB=1 PL=illumina PU=whatever SM=whatever
@@ -74,11 +80,13 @@ MarkDuplicates.jar:
 	ln -s /opt/picard/1.81/MarkDuplicates.jar .
 CreateSequenceDictionary.jar:
 	ln -s /opt/picard/1.81/CreateSequenceDictionary.jar .
-sam.raw.1.vcf gatk.raw.1.vcf \
-sam.raw.1.vcf gatk.raw.1.vcf: sam.raw.vcf gatk.raw.vcf varianttools.raw.vcf
+
+sam.raw.1.vcf gatk.raw.1.vcf: sam.raw.vcf gatk.raw.vcf 
 	./generateFilteredFiles.py
-plot.pdf venn_0.pdf:sam.raw.1.vcf gatk.raw.1.vcf
-	./overalp.y
+
+plot.pdf venn_4.pdf: sam.raw.vcf gatk.raw.vcf varianttools.raw.vcf
+	./overlap.py
+
 venn.pdf: venn_4.pdf venn_1.pdf venn_2.pdf venn_3.pdf
 	pdfjam --nup '2x2' --outfile $@ venn_1.pdf - venn_2.pdf - \
 	venn_3.pdf - venn_4.pdf - 

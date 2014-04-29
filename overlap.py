@@ -4,13 +4,14 @@ import numpy as np
 import os
 import pdb
 import sys
-import matplotlib.pyplot as plt
-from matplotlib_venn import venn2, venn3
 # to solve 'Invalid DISPLAY variable' error
 # http://bit.ly/1nkAwuk
 import matplotlib
 # Force matplotlib to not use any Xwindows backend.
 matplotlib.use('PDF')
+
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn3
 
 def sensitivity(found, total):
     try:
