@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
   dpFiles = []
   for f in files:
-    tmp = []
+    tmp = [f]
     for i in range(3, 13):
       tmp.append(".".join(f.split('.')[:2] + ['dp' + str(i), 'vcf']))
     dpFiles += tmp
@@ -120,8 +120,8 @@ if __name__ == '__main__':
       venn3Diagram(getSNPs(newFiles[i]), getSNPs(newFiles[i+10]), getSNPs(newFiles[i+20]), 
               #[newFiles[i], newFiles[i+10], newFiles[i+20]], "venn_%d.pdf" % i)
               ["Samtools", "GATK", "VariantTools"], "venn_%d.pdf" % i)
-      
-      venn3Diagram(getSNPs(dpFiles[i]), getSNPs(dpFiles[i+10]), getSNPs(dpFiles[i+20]), 
+  for i in range(11): 
+      venn3Diagram(getSNPs(dpFiles[i]), getSNPs(dpFiles[i+11]), getSNPs(dpFiles[i+22]), 
               ["Samtools", "GATK", "VariantTools"], "venn_dp%d.pdf" % i)
 
   sams = calculate(newFiles[:10], allSnps)
@@ -146,9 +146,9 @@ if __name__ == '__main__':
   simpleaxis(ax)
   fig.savefig("plot.pdf")
 
-  sams = calculate(dpFiles[:10], allSnps)
-  gatks = calculate(dpFiles[10:20], allSnps)
-  varianttools = calculate(dpFiles[20:], allSnps)
+  sams = calculate(dpFiles[:11], allSnps)
+  gatks = calculate(dpFiles[11:22], allSnps)
+  varianttools = calculate(dpFiles[22:], allSnps)
   
   fig, ax = plt.subplots()
   ax.plot(sams['TPR'], sams['FDR'], 'r-^', label='Samtools', color=colors[0])
