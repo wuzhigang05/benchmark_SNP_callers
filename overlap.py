@@ -149,7 +149,11 @@ if __name__ == '__main__':
   sams = calculate(dpFiles[:11], allSnps)
   gatks = calculate(dpFiles[11:22], allSnps)
   varianttools = calculate(dpFiles[22:], allSnps)
-  
+ 
+  # # analyze the DP and QUAL distribution for false positives
+  # samRaw = getSNPs(dpFiles[0]) 
+  # gatkRaw = getSNPs(dpFiles[11])
+  # varianttools = getSNPs(dpFiles[22])
   fig, ax = plt.subplots()
   ax.plot(sams['TPR'], sams['FDR'], 'r-^', label='Samtools', color=colors[0])
   ax.plot(gatks['TPR'], gatks['FDR'], 'b-o', label='GATK', color=colors[1])
