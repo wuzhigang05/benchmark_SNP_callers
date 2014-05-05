@@ -151,9 +151,12 @@ if __name__ == '__main__':
   ax[0][0].set_ylabel("QUAL")
   ax[1][0].set_ylabel("Read Coverage")
   degree = 0
-  ax[1][0].set_xlabel("Samtools", rotation = 0)
-  ax[1][1].set_xlabel("GATK", rotation = 0)
-  ax[1][2].set_xlabel("VariantTools", rotation = 0)
+  ax[1][0].set_xlabel("Samtools", rotation = 0, color= "black")
+  ax[1][1].set_xlabel("GATK", rotation = 0, color="black")
+  ax[1][2].set_xlabel("VariantTools", rotation = 0, color="black")
+  xticklabels = ax[1][0].get_xticklabels() + ax[1][1].get_xticklabels() + ax[1][2].get_xticklabels()
+  for l in xticklabels:
+      l.set_color("black")
   fig.set_tight_layout(True)
   fig.savefig("qualDpDist.pdf")
 
