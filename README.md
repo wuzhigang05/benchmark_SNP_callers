@@ -37,9 +37,7 @@ steps (downloading test data, performing alignments, call SNP using different SN
 fileration and etc) and finally generate a ROC curve pdf named "plot.pdf" in your current direcory.
 WARNING, make sure you have 10GB diskspace available before you type ``make`` because of the intermediate fastq files.
 ```bash
-git clone http://github.com/wuzhigang05/benchmark_SNP_callers 
-make
-make open
+(git clone http://github.com/wuzhigang05/benchmark_SNP_callers; cd benchmark_SNP_callers; make)
 ```
 ### Results ###
 * overlap among three SNP callers
