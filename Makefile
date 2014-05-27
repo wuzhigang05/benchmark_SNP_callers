@@ -1,4 +1,4 @@
-all: plot.pdf venn.pdf
+all: plot.pdf
 ref = Chr4.fasta
 refIndex = $(addsuffix .sa, $(ref))
 readFile = sreads.fq
